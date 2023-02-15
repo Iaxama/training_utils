@@ -1,7 +1,4 @@
 import numpy as np
-import torch
-
-from snntorch import spikegen
 
 def applyRMS(data):
     return np.sqrt(np.mean(np.square(data), axis=0))
@@ -81,18 +78,21 @@ def compute_features_window(data, features_list):
     # Myopulse percentage rate (MPR)
     if 'mpr' in features_list or 'all' in features_list:
         mpr = np.sum((np.abs(data) - np.std(data, axis=0)) > 0, axis=0)
-
+        
     variables = locals()
     return np.array([variables[x] for x in features_list])
 
 
-def convert_tensor_to_spikes(data, threshold=.05):
-    data -= torch.mean(data)
-    data /= torch.std(data)
-
-    spikes = spikegen.delta(data, threshold=threshold, padding=False, off_spike=True)
-    all_spikes = torch.zeros((spikes.shape[0], 2, spikes.shape[1]))
-    all_spikes[:, 0, :] = torch.where(spikes == 1, 1, 0)
-    all_spikes[:, 1, :] = torch.where(spikes == -1, 1, 0)
-    all_spikes = torch.unsqueeze(all_spikes, -1)
-    return all_spikes
+def convert_nparray_to_spikes(data, threshold=.05, off_spikes=False):
+    data -= np.mean(data)
+    data /= np.std(data)
+    
+    diff = np.diff(data, prepend=0, axis=1)
+    spikes = (diff > threshold).astype(np.float32)
+    if off_spikes:
+        off = (diff < -threshold).astype(np.float32)
+        spikes = np.stack((spikes, off), axis=1)
+    else:
+        spikes = np.expand_dims(spikes, axis=1)
+        
+    return spikes

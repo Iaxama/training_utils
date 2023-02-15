@@ -16,11 +16,18 @@ class Params(dict):
         if not 'num_channels' in self.keys():
             self['num_channels'] = 64
 
+        if 'window_features' not in self.keys():
+            self['window_features'] = self['deltat']
+        if 'increment_features' not in self.keys():
+            self['increment_features'] = 1 / self['sampling_rate']
+
+        self['window'] = int(self['deltat'] * self['sampling_rate'])
+        self['increment'] = int(self['step'] * self['sampling_rate'])
+
+
         self['window_features'] = int(self['window_features'] * self['sampling_rate'])
         self['increment_features'] = int(self['increment_features'] * self['sampling_rate'])
         
-        self['window'] = int(self['deltat'] * self['sampling_rate'])
-        self['increment'] = int(self['step'] * self['sampling_rate'])
         
         self['sample_length'] = int((self['window'] - (self['window_features'] - self['increment_features'])) / self['increment_features'])
 
