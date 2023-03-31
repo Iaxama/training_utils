@@ -12,7 +12,11 @@ class Params(dict):
     def _from_dict(self, in_dict):
         self.update(in_dict)
         
-        self['in_channels'] = len(self['features'])
+        try:
+            self['in_channels'] = len(self['features'])
+        except:
+            self['in_channels'] = 1
+            
         if not 'num_channels' in self.keys():
             self['num_channels'] = 64
 
@@ -24,13 +28,14 @@ class Params(dict):
         self['window'] = int(self['deltat'] * self['sampling_rate'])
         self['increment'] = int(self['step'] * self['sampling_rate'])
 
-
-        self['window_features'] = int(self['window_features'] * self['sampling_rate'])
-        self['increment_features'] = int(self['increment_features'] * self['sampling_rate'])
-        
-        
-        self['sample_length'] = int((self['window'] - (self['window_features'] - self['increment_features'])) / self['increment_features'])
-
+        if self['features'] is not None:
+            self['window_features'] = int(self['window_features'] * self['sampling_rate'])
+            self['increment_features'] = int(self['increment_features'] * self['sampling_rate'])
+            
+            
+            self['sample_length'] = int((self['window'] - (self['window_features'] - self['increment_features'])) / self['increment_features'])
+        else:
+            self['sample_length'] = self['legendre_q']
         
         self['lr'] = self['learning_rate']  # Some functions accept the keyword lr instead of learning rate
         self['dt'] = self['deltat']  # Some functions accept the keyword dt instead of deltat
