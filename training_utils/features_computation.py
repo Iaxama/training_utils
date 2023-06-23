@@ -1,18 +1,21 @@
 import numpy as np
-from scipy.signal import butter, filtfilt
+from scipy.signal import butter, filtfilt, iirnotch
 
 def butter_bandpass(lowcut, highcut, fs, order=4):
-    nyq = 0.5 * fs
-    low = lowcut / nyq
-    high = highcut / nyq
+    nyquist = 0.5 * fs
+    low = lowcut / nyquist
+    high = highcut / nyquist
     b, a = butter(order, [low, high], btype='band')
     return b, a
 
-def butter_bandpass_filter(data, lowcut, highcut, fs, order=4):
+def butter_bandpass_filter(data, lowcut, highcut, fs, axis=0, order=4):
     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    filtered_data = np.zeros_like(data)
-    for i in range(data.shape[0]):
-        filtered_data[i, :] = filtfilt(b, a, data[i, :])
+    filtered_data = filtfilt(b, a, data, axis=axis)
+    return filtered_data
+
+def notch_filter(data, freqs, fs, axis=0):
+    b, a = iirnotch(freqs, Q=10, fs=fs)
+    filtered_data = filtfilt(b, a, data, axis=axis)
     return filtered_data
 
 def applyRMS(data):
