@@ -17,9 +17,12 @@ class Params(dict):
         except:
             self['in_channels'] = 1
             
-        if not 'num_channels' in self.keys():
-            self['num_channels'] = 64
-
+        if not 'l2_reg_weight' in self.keys():
+            self['l2_reg_weight'] = 0
+        
+        if 'window_features' not in self.keys():
+            self['window_features'] = self['deltat']
+        
         if 'window_features' not in self.keys():
             self['window_features'] = self['deltat']
         if 'increment_features' not in self.keys():
