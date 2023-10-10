@@ -110,11 +110,12 @@ def convert_nparray_to_spikes(data, threshold=0, output_off_spikes=False):
         is_spike = diff > threshold
         last_time_step[is_spike] = time_step[is_spike]
         spikes[:, n][is_spike] = 1
-        diff[is_spike] = 0
         if output_off_spikes:
             is_off_spike = diff < -threshold
             off_spikes[:, n][is_off_spike] = 1
             last_time_step[is_off_spike] = time_step[is_off_spike]
+            is_spike += is_off_spike
+        diff[is_spike] = 0
     if output_off_spikes:
         spikes = np.stack((spikes, off_spikes), axis=1)
     else:
