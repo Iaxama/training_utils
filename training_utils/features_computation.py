@@ -116,25 +116,22 @@ def compute_features_window(data, features_list):
     return np.array([variables[x] for x in features_list])
 
 
-def convert_nparray_to_spikes(data, threshold=.05, output_off_spikes=False):
-    # data -= np.mean(data)
-    # data /= np.std(data)
-    
+def convert_nparray_to_spikes(data, threshold=0, output_off_spikes=False):
     diff = np.zeros(data[:, 0].shape)
     spikes = np.zeros(data.shape)
     off_spikes = np.zeros(data.shape)
-
     last_time_step = data[:, 0]
     for n, time_step in enumerate(data.swapaxes(0, 1)):
-        diff += time_step -last_time_step
-        last_time_step = time_step
+        diff = np.abs(time_step - last_time_step) if not output_off_spikes else time_step - last_time_step
         is_spike = diff > threshold
+        last_time_step[is_spike] = time_step[is_spike]
         spikes[:, n][is_spike] = 1
-        diff[is_spike] = 0
         if output_off_spikes:
             is_off_spike = diff < -threshold
             off_spikes[:, n][is_off_spike] = 1
-            diff[is_off_spike] = 0
+            last_time_step[is_off_spike] = time_step[is_off_spike]
+            is_spike += is_off_spike
+        diff[is_spike] = 0
     if output_off_spikes:
         spikes = np.stack((spikes, off_spikes), axis=1)
     else:

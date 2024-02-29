@@ -12,6 +12,8 @@ class Params(dict):
     def _from_dict(self, in_dict):
         self.update(in_dict)
         
+        if not 'frequency_filter' in self.keys():
+            self['frequency_filter'] = True
         self['in_channels'] = len(self['features'])
         if not 'num_channels' in self.keys():
             self['num_channels'] = 64
