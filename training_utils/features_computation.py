@@ -95,6 +95,22 @@ def compute_features_window(data, features_list):
     # Myopulse percentage rate (MPR)
     if 'mpr' in features_list or 'all' in features_list:
         mpr = np.sum((np.abs(data) - np.std(data, axis=0)) > 0, axis=0)
+    
+    # Integral Absolute Value (IAV)
+    if 'iav' in features_list or 'all' in features_list:
+        iav = np.sum(np.abs(data), axis=0)
+
+    # Variance (VAR)
+    if 'var' in features_list or 'all' in features_list:
+        var = np.var(data, axis=0)
+
+    # Average Amplitude Change (AAC)
+    if 'aac' in features_list or 'all' in features_list:
+        aac = np.sum(np.abs(derivative), axis=0) / window
+
+    # Mean Square Root (MSR)
+    if 'msr' in features_list or 'all' in features_list:
+        msr = np.sum(np.sqrt(np.abs(data)), axis=0) / window
         
     variables = locals()
     return np.array([variables[x] for x in features_list])
