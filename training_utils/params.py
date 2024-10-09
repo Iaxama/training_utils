@@ -37,7 +37,13 @@ class Params(dict):
         self['lr'] = self['learning_rate']  # Some functions accept the keyword lr instead of learning rate
         self['dt'] = self['deltat']  # Some functions accept the keyword dt instead of deltat
         self['method'] = self['learning_method']  # Some functions accept the kw method instead of learning_method
-
+        for x in self:
+            try:
+                self[x] = eval(self[x])
+                pass
+            except:
+                pass
+        
     @__init__.register(str)
     def _from_file_name(self, file_name):
         in_dict = yaml.load(open(file_name), yaml.FullLoader)
