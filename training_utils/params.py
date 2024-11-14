@@ -43,8 +43,18 @@ class Params(dict):
                 pass
             except:
                 pass
+        self.used_keys=[]
         
     @__init__.register(str)
     def _from_file_name(self, file_name):
         in_dict = yaml.load(open(file_name), yaml.FullLoader)
         self._from_dict(in_dict)
+
+    def __getitem__(self, key):
+        if hasattr(self, 'used_keys'):
+            if not key in self.used_keys:
+                self.used_keys.append(key)
+        return super().__getitem__(key)
+
+    def save_used_keys_to_yaml(self, file_name):
+        yaml.dump({x: self[x] for x in self.used_keys}, open(file_name, 'w'))
