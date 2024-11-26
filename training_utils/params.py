@@ -23,24 +23,28 @@ class Params(dict):
         if 'increment_features' not in self.keys():
             self['increment_features'] = 1 / self['sampling_rate']
 
-        self['window'] = int(self['deltat'] * self['sampling_rate'])
-        self['increment'] = int(self['step'] * self['sampling_rate'])
-
-
-        self['window_features'] = int(self['window_features'] * self['sampling_rate'])
-        self['increment_features'] = int(self['increment_features'] * self['sampling_rate'])
+        if 'window' not in self.keys():
+            self['window'] = int(self['deltat'] * self['sampling_rate'])
+        if 'increment' not in self.keys():
+            self['increment'] = int(self['step'] * self['sampling_rate'])
         
+        if type(self['window_features']) is not int: 
+            self['window_features'] = int(self['window_features'] * self['sampling_rate'])
+        if type(self['increment_features']) is not int: 
+            self['increment_features'] = int(self['increment_features'] * self['sampling_rate'])
         
-        self['sample_length'] = int((self['window'] - (self['window_features'] - self['increment_features'])) / self['increment_features'])
+        if not 'sample_length' in self.keys():
+            self['sample_length'] = int((self['window'] - (self['window_features'] - self['increment_features'])) / self['increment_features'])
 
-        
-        self['lr'] = self['learning_rate']  # Some functions accept the keyword lr instead of learning rate
-        self['dt'] = self['deltat']  # Some functions accept the keyword dt instead of deltat
-        self['method'] = self['learning_method']  # Some functions accept the kw method instead of learning_method
+        if 'learning_rate' in self.keys():
+            self['lr'] = self['learning_rate']  # Some functions accept the keyword lr instead of learning rate
+        if 'deltat' in self.keys():
+            self['dt'] = self['deltat']  # Some functions accept the keyword dt instead of deltat
+        if 'learning_method' in self.keys():
+            self['method'] = self['learning_method']  # Some functions accept the kw method instead of learning_method
         for x in self:
             try:
                 self[x] = eval(self[x])
-                pass
             except:
                 pass
         self.used_keys=[]
