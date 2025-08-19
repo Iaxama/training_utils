@@ -12,29 +12,31 @@ class Params(dict):
     def _from_dict(self, in_dict):
         self.update(in_dict)
         
-        if not 'frequency_filter' in self.keys():
-            self['frequency_filter'] = True
-        self['in_channels'] = len(self['features'])
-        if not 'num_channels' in self.keys():
-            self['num_channels'] = 64
-
-        if 'window_features' not in self.keys():
-            self['window_features'] = self['deltat']
-        if 'increment_features' not in self.keys():
-            self['increment_features'] = 1 / self['sampling_rate']
-
+        
         if 'window' not in self.keys():
             self['window'] = int(self['deltat'] * self['sampling_rate'])
         if 'increment' not in self.keys():
             self['increment'] = int(self['step'] * self['sampling_rate'])
         
-        if type(self['window_features']) is not int: 
-            self['window_features'] = int(self['window_features'] * self['sampling_rate'])
-        if type(self['increment_features']) is not int: 
-            self['increment_features'] = int(self['increment_features'] * self['sampling_rate'])
+        if not 'frequency_filter' in self.keys():
+            self['frequency_filter'] = True
+        if 'features' in self.keys():
+            self['in_channels'] = len(self['features'])
+            if not 'num_channels' in self.keys():
+                self['num_channels'] = 64
+
+            if 'window_features' not in self.keys():
+                self['window_features'] = self['deltat']
+            if 'increment_features' not in self.keys():
+                self['increment_features'] = 1 / self['sampling_rate']
         
-        if not 'sample_length' in self.keys():
-            self['sample_length'] = int((self['window'] - (self['window_features'] - self['increment_features'])) / self['increment_features'])
+            if type(self['window_features']) is not int: 
+                self['window_features'] = int(self['window_features'] * self['sampling_rate'])
+            if type(self['increment_features']) is not int: 
+                self['increment_features'] = int(self['increment_features'] * self['sampling_rate'])
+            
+            if not 'sample_length' in self.keys():
+                self['sample_length'] = int((self['window'] - (self['window_features'] - self['increment_features'])) / self['increment_features'])
 
         if 'learning_rate' in self.keys():
             self['lr'] = self['learning_rate']  # Some functions accept the keyword lr instead of learning rate
